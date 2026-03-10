@@ -10,6 +10,9 @@ from agent.cache import init_db, filter_new_items, mark_seen, cleanup_old_entrie
 from agent.brain import score_and_enrich
 from agent.formatter import format_daily
 from agent.delivery import send_slack
+from agent.competitor_collector import collect_competitor_signals
+from agent.competitor_brain import analyze_competitor_signals
+from agent.competitor_formatter import format_competitor_roundup
 
 
 def load_config() -> dict:
@@ -74,16 +77,49 @@ def run_daily(config: dict, dry_run: bool = False) -> None:
     print("\n[main] Done.")
 
 
+def run_competitor(config: dict, dry_run: bool = False) -> None:
+    print(f"\n=== Competitor Intel — {datetime.now().strftime('%Y-%m-%d %H:%M')} ===\n")
+
+    print("[main] Step 1: Collecting competitor signals...")
+    signals = collect_competitor_signals(config)
+    if not signals:
+        print("[main] No competitor signals found. Exiting.")
+        return
+
+    print("[main] Step 2: Analyzing signals with Claude...")
+    enriched = analyze_competitor_signals(signals, config)
+
+    print("[main] Step 3: Formatting Slack roundup...")
+    blocks = format_competitor_roundup(enriched, config)
+
+    if dry_run:
+        import json
+        print("\n[main] DRY RUN — Competitor roundup NOT sent. Blocks:")
+        output = json.dumps(blocks, ensure_ascii=True, indent=2)
+        sys.stdout.buffer.write(output.encode("utf-8"))
+        sys.stdout.buffer.write(b"\n")
+    else:
+        print("[main] Step 4: Sending to Slack...")
+        send_slack(blocks, config)
+
+    print("\n[main] Done.")
+
+
 def main():
     load_dotenv()
 
     dry_run = "--dry-run" in sys.argv
+    competitor_mode = "--competitor" in sys.argv
 
     if dry_run:
         print("[main] Running in DRY RUN mode (no Slack message will be sent)")
 
     config = load_config()
-    run_daily(config, dry_run=dry_run)
+
+    if competitor_mode:
+        run_competitor(config, dry_run=dry_run)
+    else:
+        run_daily(config, dry_run=dry_run)
 
 
 if __name__ == "__main__":

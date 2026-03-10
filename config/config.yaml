@@ -181,3 +181,62 @@ slack:
 cache:
   db_path: "data/cache.db"
   max_age_days: 7
+
+competitor_intel:
+  schedule: "0 8 * * 5"   # Freitag 08:00 UTC = 09:00 CET
+  slack_channel: "#deko-intel"
+
+  competitors:
+    tier1:
+      - name: "HERO Software"
+        google_news_query: "HERO Software Handwerk"
+
+      - name: "Tooltime"
+        google_news_query: "Tooltime Handwerkersoftware"
+
+      - name: "Craftnote"
+        google_news_query: "Craftnote Handwerk"
+
+      - name: "openHandwerk"
+        google_news_query: "openHandwerk Software"
+
+    tier2:
+      - name: "WinWorker"
+        google_news_query: "WinWorker Software Handwerk"
+
+      - name: "Sander & Doll"
+        google_news_query: "Sander Doll Handwerk Software"
+
+      - name: "TAIFUN"
+        google_news_query: "TAIFUN Software Elektro"
+
+      - name: "Streit V.1"
+        google_news_query: "Streit V1 Maler Software"
+
+      - name: "MF Dach"
+        google_news_query: "MF Dach Software Dachdecker"
+
+      - name: "M-Soft"
+        google_news_query: "M-Soft Handwerk"
+
+      - name: "Malistor"
+        google_news_query: "Malistor Maler Software"
+
+    tier3:
+      - name: "lexoffice"
+        google_news_query: "lexoffice Handwerk"
+
+      - name: "sevDesk"
+        google_news_query: "sevDesk Handwerk"
+
+  signal_weights:
+    pricing_change: 10
+    new_feature: 8
+    negative_review: 7
+    press_release: 5
+    hiring_signal: 4
+    blog_post: 3
+    positive_review: 2
+    funding: 9
+    partnership: 6
+    general: 1

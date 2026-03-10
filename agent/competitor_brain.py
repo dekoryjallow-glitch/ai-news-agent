@@ -52,7 +52,11 @@ Analysiere jedes Signal und erstelle ein JSON-Array mit folgenden Feldern pro It
 - relevance_score: Zahl 1-10 (wie relevant ist das fuer Plancrafts Outbound/Positioning)
 - summary: 1-2 Saetze was passiert ist (Deutsch)
 - sales_implication: Was bedeutet das konkret fuer Plancrafts Outbound oder Positionierung? (1 Satz, direkt und umsetzbar)
+- customer_pain: Falls es sich um eine Review oder Beschwerde handelt — welcher konkrete Schmerzpunkt wird genannt? (kurz, oder null)
 - is_hot: true wenn das Signal sofortige Aufmerksamkeit braucht (Preisaenderung, grosses Feature, schlechte Reviews, Funding)
+
+Bei Signalen vom Typ "review": Fokus auf konkrete Beschwerden (Support, Preis, fehlende Features, Bugs).
+Bei negativen Reviews: sales_implication sollte einen konkreten Outbound-Pitch-Baustein liefern.
 
 Antworte NUR mit dem JSON-Array, kein Text darum.
 """

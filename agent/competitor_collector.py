@@ -68,23 +68,56 @@ def fetch_google_news(competitor_name: str, query: str, max_items: int = 10) -> 
 
 
 def collect_competitor_signals(config: dict) -> list[dict]:
+    import os
+    from agent.web_search import search as tavily_search, search_reviews
+
     competitor_config = config.get("competitor_intel", {})
     competitors = competitor_config.get("competitors", {})
+    use_tavily = bool(os.environ.get("TAVILY_API_KEY"))
+
+    if not use_tavily:
+        print("[competitor_collector] TAVILY_API_KEY not set — using Google News only")
 
     all_signals = []
+    seen_urls = set()
 
     for tier, tier_competitors in competitors.items():
         for comp in tier_competitors:
             name = comp["name"]
             query = comp.get("google_news_query", name)
+            comp_signals = []
 
-            items = fetch_google_news(name, query, max_items=8)
-            for item in items:
-                item["tier"] = tier
-            all_signals.extend(items)
+            # 1. Google News RSS (always)
+            news_items = fetch_google_news(name, query, max_items=8)
+            comp_signals.extend(news_items)
 
-            print(f"[competitor_collector] {name} ({tier}): {len(items)} signals")
+            # 2. Tavily web search for broader news (Tier 1 only)
+            if use_tavily and tier == "tier1":
+                web_items = tavily_search(
+                    query=f"{name} Handwerkersoftware News 2025 2026",
+                    max_results=4,
+                )
+                for item in web_items:
+                    item["competitor"] = name
+                    item["type"] = "news"
+                comp_signals.extend(web_items)
+
+                # 3. Review / unhappy customer search (Tier 1 only)
+                review_items = search_reviews(name, max_results=4)
+                comp_signals.extend(review_items)
+
+            # Deduplicate by URL, attach tier
+            for item in comp_signals:
+                url = item.get("url", "")
+                if url and url not in seen_urls:
+                    seen_urls.add(url)
+                    item["tier"] = tier
+                    all_signals.append(item)
+
+            news_count = len([s for s in comp_signals if s.get("type") == "news"])
+            review_count = len([s for s in comp_signals if s.get("type") == "review"])
+            print(f"[competitor_collector] {name} ({tier}): {news_count} news, {review_count} reviews")
 
     all_signals.sort(key=lambda x: x.get("date", ""), reverse=True)
-    print(f"[competitor_collector] Total competitor signals: {len(all_signals)}")
+    print(f"[competitor_collector] Total signals: {len(all_signals)}")
     return all_signals

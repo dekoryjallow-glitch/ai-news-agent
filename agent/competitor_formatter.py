@@ -76,12 +76,46 @@ def format_competitor_roundup(signals: list[dict], config: dict) -> list[dict]:
         })
         blocks.append({"type": "divider"})
 
+    # Community Pulse — negative reviews & customer pains
+    review_signals = [
+        s for s in signals
+        if s.get("type") == "review" and s.get("signal_type") in ("negative_review", "general")
+        and s.get("customer_pain")
+    ]
+
+    if review_signals:
+        blocks.append({
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": "*COMMUNITY PULSE — Unzufriedene Kunden*"},
+        })
+
+        pulse_lines = []
+        seen_comps = set()
+        for s in sorted(review_signals, key=lambda x: x.get("relevance_score", 0), reverse=True)[:6]:
+            comp = s["competitor"]
+            pain = s.get("customer_pain", "")
+            sales_impl = s.get("sales_implication", "")
+            tier_emoji = TIER_EMOJIS.get(s.get("tier", "tier2"), "🔵")
+            line = f"• {tier_emoji} *{comp}:* {pain}"
+            if sales_impl and comp not in seen_comps:
+                line += f"\n  🎯 _{sales_impl}_"
+                seen_comps.add(comp)
+            line += f" → <{s['url']}|Quelle>"
+            pulse_lines.append(line)
+
+        blocks.append({
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": "\n".join(pulse_lines)},
+        })
+        blocks.append({"type": "divider"})
+
     # Stats
     hot_count = len(hot_signals)
     total_count = len(signals)
     competitors_tracked = len(set(s["competitor"] for s in signals))
+    review_count = len([s for s in signals if s.get("type") == "review"])
 
-    stats = f"📊 *Stats:* {competitors_tracked} Competitors getrackt | {total_count} Signals analysiert | {hot_count} Hot Signals"
+    stats = f"📊 *Stats:* {competitors_tracked} Competitors getrackt | {total_count} Signals | {review_count} Reviews | {hot_count} Hot"
     blocks.append({
         "type": "section",
         "text": {"type": "mrkdwn", "text": stats},

@@ -109,13 +109,46 @@ def format_competitor_roundup(signals: list[dict], config: dict) -> list[dict]:
         })
         blocks.append({"type": "divider"})
 
+    # Social Media Signals
+    social_signals = [
+        s for s in signals
+        if s.get("type") == "social" and s.get("relevance_score", 0) >= 5
+    ]
+
+    if social_signals:
+        blocks.append({
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": "*SOCIAL MEDIA PULSE*"},
+        })
+
+        platform_icons = {"LinkedIn": "💼", "Reddit": "🟠", "Facebook": "🔵", "Xing": "🟢", "Social": "📱"}
+        social_lines = []
+        for s in sorted(social_signals, key=lambda x: x.get("relevance_score", 0), reverse=True)[:6]:
+            platform = s.get("platform", "Social")
+            icon = platform_icons.get(platform, "📱")
+            tier_emoji = TIER_EMOJIS.get(s.get("tier", "tier2"), "🔵")
+            summary = s.get("summary", s.get("title", ""))[:100]
+            sales_impl = s.get("sales_implication", "")
+            line = f"• {icon} {tier_emoji} *{s['competitor']}:* {summary}"
+            if sales_impl:
+                line += f"\n  🎯 _{sales_impl}_"
+            line += f" → <{s['url']}|{platform}>"
+            social_lines.append(line)
+
+        blocks.append({
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": "\n".join(social_lines)},
+        })
+        blocks.append({"type": "divider"})
+
     # Stats
     hot_count = len(hot_signals)
     total_count = len(signals)
     competitors_tracked = len(set(s["competitor"] for s in signals))
     review_count = len([s for s in signals if s.get("type") == "review"])
+    social_count = len([s for s in signals if s.get("type") == "social"])
 
-    stats = f"📊 *Stats:* {competitors_tracked} Competitors getrackt | {total_count} Signals | {review_count} Reviews | {hot_count} Hot"
+    stats = f"📊 *Stats:* {competitors_tracked} Competitors | {total_count} Signals | {review_count} Reviews | {social_count} Social | {hot_count} Hot"
     blocks.append({
         "type": "section",
         "text": {"type": "mrkdwn", "text": stats},

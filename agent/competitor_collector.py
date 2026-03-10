@@ -69,7 +69,7 @@ def fetch_google_news(competitor_name: str, query: str, max_items: int = 10) -> 
 
 def collect_competitor_signals(config: dict) -> list[dict]:
     import os
-    from agent.web_search import search as tavily_search, search_reviews
+    from agent.web_search import search as tavily_search, search_reviews, search_social
 
     competitor_config = config.get("competitor_intel", {})
     competitors = competitor_config.get("competitors", {})
@@ -106,6 +106,10 @@ def collect_competitor_signals(config: dict) -> list[dict]:
                 review_items = search_reviews(name, max_results=4)
                 comp_signals.extend(review_items)
 
+                # 4. Social media search — LinkedIn, Reddit, Facebook (Tier 1 only)
+                social_items = search_social(name, max_results=4)
+                comp_signals.extend(social_items)
+
             # Deduplicate by URL, attach tier
             for item in comp_signals:
                 url = item.get("url", "")
@@ -116,7 +120,8 @@ def collect_competitor_signals(config: dict) -> list[dict]:
 
             news_count = len([s for s in comp_signals if s.get("type") == "news"])
             review_count = len([s for s in comp_signals if s.get("type") == "review"])
-            print(f"[competitor_collector] {name} ({tier}): {news_count} news, {review_count} reviews")
+            social_count = len([s for s in comp_signals if s.get("type") == "social"])
+            print(f"[competitor_collector] {name} ({tier}): {news_count} news, {review_count} reviews, {social_count} social")
 
     all_signals.sort(key=lambda x: x.get("date", ""), reverse=True)
     print(f"[competitor_collector] Total signals: {len(all_signals)}")

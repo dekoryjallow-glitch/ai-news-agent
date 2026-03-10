@@ -57,6 +57,7 @@ Analysiere jedes Signal und erstelle ein JSON-Array mit folgenden Feldern pro It
 
 Bei Signalen vom Typ "review": Fokus auf konkrete Beschwerden (Support, Preis, fehlende Features, Bugs).
 Bei negativen Reviews: sales_implication sollte einen konkreten Outbound-Pitch-Baustein liefern.
+Bei Signalen vom Typ "social" (LinkedIn, Reddit, Facebook, Xing): Fokus auf Stimmung, Community-Reaktionen, Mitarbeiter-Posts, Job-Angebote als strategische Signale.
 
 Antworte NUR mit dem JSON-Array, kein Text darum.
 """

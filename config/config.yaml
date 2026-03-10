@@ -1,0 +1,183 @@
+agent:
+  name: "Deko Intel Agent"
+  schedule:
+    daily: "0 7 * * 1-5"       # Mo-Fr 07:00 UTC = 08:00 CET
+    weekly: "0 17 * * 5"        # Fr 17:00 UTC = 18:00 CET
+  output:
+    daily_max_items: 8
+    radar_max_items: 5
+    weekly_top_items: 3
+
+clusters:
+  sales_plancraft:
+    weight: 5
+    emoji: "sales"
+    keywords:
+      - "outbound sales"
+      - "cold email"
+      - "reply rate"
+      - "SaaS GTM"
+      - "go-to-market"
+      - "PLG"
+      - "HubSpot"
+      - "sales automation"
+      - "CRM"
+      - "AI SDR"
+      - "lead scoring"
+      - "prospecting"
+      - "Handwerk"
+      - "trades software"
+      - "SMB SaaS"
+      - "sales sequencing"
+      - "Clay"
+      - "Apollo"
+      - "Lemlist"
+    project_bonus:
+      - "outbound-agent"
+      - "plancraft"
+
+  builder:
+    weight: 4
+    emoji: "builder"
+    keywords:
+      - "AI developer tools"
+      - "function calling"
+      - "MCP"
+      - "model context protocol"
+      - "cursor"
+      - "v0"
+      - "bolt"
+      - "lovable"
+      - "vibe coding"
+      - "nextjs"
+      - "next.js"
+      - "supabase"
+      - "vercel"
+      - "AI agents"
+      - "agent framework"
+      - "orchestration"
+      - "indie hacker"
+      - "micro-saas"
+      - "indie hackers"
+      - "anthropic"
+      - "SDK"
+    project_bonus:
+      - "dia-agent"
+      - "vibe-week"
+
+  health:
+    weight: 3
+    emoji: "health"
+    keywords:
+      - "digital health"
+      - "AI healthcare"
+      - "diabetes tech"
+      - "CGM"
+      - "continuous glucose"
+      - "insulin"
+      - "health coaching"
+      - "wellness tech"
+      - "patient management"
+      - "health app"
+      - "Dexcom"
+      - "FDA approval"
+      - "Krankenkasse"
+    project_bonus:
+      - "dia-agent"
+
+  macro:
+    weight: 2
+    emoji: "macro"
+    keywords:
+      - "gold price"
+      - "commodities"
+      - "energy price"
+      - "geopolitics"
+      - "sanctions"
+      - "VC funding"
+      - "tech IPO"
+      - "M&A"
+      - "startup funding"
+      - "series A"
+      - "series B"
+      - "valuation"
+
+  general_ai:
+    weight: 1
+    emoji: "ai"
+    keywords:
+      - "new AI model"
+      - "benchmark"
+      - "GPT"
+      - "Claude"
+      - "Gemini"
+      - "Llama"
+      - "prompting"
+      - "chain of thought"
+      - "AI regulation"
+      - "EU AI Act"
+      - "viral AI tool"
+      - "product hunt"
+      - "language model"
+      - "LLM"
+      - "reasoning model"
+
+sources:
+  tier1:
+    rss:
+      - url: "https://news.ycombinator.com/rss"
+        name: "Hacker News"
+        max_items: 30
+
+      - url: "https://www.producthunt.com/feed"
+        name: "Product Hunt"
+        max_items: 20
+
+      - url: "https://techcrunch.com/feed/"
+        name: "TechCrunch"
+        max_items: 20
+
+      - url: "https://tldr.tech/api/rss/ai"
+        name: "TLDR AI"
+        max_items: 15
+
+      - url: "https://venturebeat.com/category/ai/feed/"
+        name: "VentureBeat AI"
+        max_items: 15
+
+      - url: "https://www.technologyreview.com/topic/artificial-intelligence/feed"
+        name: "MIT Tech Review AI"
+        max_items: 10
+
+      - url: "https://dev.to/feed/tag/ai"
+        name: "Dev.to AI"
+        max_items: 15
+
+      - url: "https://www.wired.com/feed/tag/ai/latest/rss"
+        name: "Wired AI"
+        max_items: 10
+
+ai:
+  model: "claude-sonnet-4-6"
+  max_tokens: 4096
+  temperature: 0.3
+  system_prompt: |
+    Du bist Dekos persoenlicher AI Intelligence Agent.
+    Dein Job: News finden, bewerten, und mit konkreten Use-Case-Ideen fuer seine Projekte und Arbeit liefern.
+
+    Dekos aktuelle Projekte:
+    - DiaAgent: Ein AI-Agent fuer Diabetes-Management
+    - Outbound Agent: AI-gestuetzter Outbound Sales Agent fuer Plancraft (SaaS fuer Handwerker)
+    - Vibe Week: Side Projects mit Vibe Coding / No-Code Tools
+
+    Sei direkt, keine Floskeln, keine Fuellwoerter.
+    Sprache: Deutsch, Du-Form.
+    Ideen muessen konkret und umsetzbar sein, keine generischen Aussagen.
+
+slack:
+  webhook_url: "${SLACK_WEBHOOK_URL}"
+  channel: "#deko-intel"
+
+cache:
+  db_path: "data/cache.db"
+  max_age_days: 7
